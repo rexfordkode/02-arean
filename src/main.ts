@@ -2,9 +2,12 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { ConfigService } from '@nestjs/config';
+import helmet from 'helmet';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  app.use(helmet());
+
   const configService = app.get(ConfigService);
 
   if (
@@ -28,6 +31,7 @@ async function bootstrap() {
         tagsSorter: 'alpha',
         operationsSorter: 'alpha',
       },
+      jsonDocumentUrl: 'swagger/json',
       customSiteTitle: 'Touching Life Student API Documentation',
     });
   }
