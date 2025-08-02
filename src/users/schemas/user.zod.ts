@@ -1,12 +1,12 @@
 import { z } from 'zod';
-import { ProfileSchema } from './profile.zod';
+import { ProfileSchema, CreateProfileSchema } from './profile.zod';
 
 /**
  * Base User Schema
  */
 const UserBaseSchema = z.object({
-  email: z.string().email(),
-  username: z.string().min(3).max(50),
+  email: z.string().email().nullable(),
+  username: z.string().min(3).max(50).nullable(),
 });
 
 // Password validation regex
@@ -18,18 +18,22 @@ const passwordMessage =
 /**
  * Create User Schema
  */
-export const CreateUserSchema = UserBaseSchema.extend({
-  password: z
-    .string()
-    .min(8, 'Password must be at least 8 characters')
-    .max(100, 'Password must be less than 100 characters')
-    .regex(passwordRegex, passwordMessage),
-  confirmPassword: z.string(),
-  profile: ProfileSchema.optional(),
-}).refine((data) => data.password === data.confirmPassword, {
-  message: "Passwords don't match",
-  path: ['confirmPassword'],
-});
+export const CreateUserSchema = z
+  .object({
+    email: z.string().email(),
+    username: z.string().min(3).max(50),
+    password: z
+      .string()
+      .min(8, 'Password must be at least 8 characters')
+      .max(100, 'Password must be less than 100 characters')
+      .regex(passwordRegex, passwordMessage),
+    confirmPassword: z.string(),
+    profile: CreateProfileSchema.optional(),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords don't match",
+    path: ['confirmPassword'],
+  });
 
 /**
  * Update User Schema
@@ -43,7 +47,7 @@ export const UpdateUserSchema = UserBaseSchema.extend({
     .regex(passwordRegex, passwordMessage)
     .optional(),
   confirmNewPassword: z.string().optional(),
-  profile: ProfileSchema.optional(),
+  profile: CreateProfileSchema.optional(),
 }).refine(
   (data) => {
     if (data.newPassword) {
@@ -69,12 +73,15 @@ export const LoginUserSchema = z.object({
 /**
  * Response User Schema (for API responses)
  */
-export const UserResponseSchema = UserBaseSchema.extend({
+export const UserResponseSchema = z.object({
   id: z.string().uuid(),
+  email: z.string().email().nullable(),
+  username: z.string().nullable(),
   avatarUrl: z.string().url().nullable(),
-  roles: z.array(z.string()).default(['user']),
+  roles: z.array(z.string()),
+  provider: z.enum(['local', 'google', 'github']).nullable(),
+  providerId: z.string().nullable(),
   profile: ProfileSchema.nullable(),
-  provider: z.enum(['local', 'google', 'github']).default('local'),
-  createdAt: z.date(),
-  updatedAt: z.date(),
+  createdAt: z.date().nullable(),
+  updatedAt: z.date().nullable(),
 });

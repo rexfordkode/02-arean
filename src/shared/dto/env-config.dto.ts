@@ -6,11 +6,11 @@ export const envConfig = z.object({
     .enum(['development', 'production', 'local'])
     .default('development'),
   PORT: z.coerce.number().default(3000),
-  JWT_SECRET: z.string().min(1),
-  JWT_EXPIRATION: z.string().min(1),
-  JWT_REFRESH_SECRET: z.string().min(1),
-  JWT_REFRESH_EXPIRATION: z.string().min(1),
-  DATABASE_URL: z.string().min(1),
+  JWT_SECRET: z.string().min(16),
+  JWT_EXPIRATION: z.string().min(16),
+  JWT_REFRESH_SECRET: z.string().min(16),
+  JWT_REFRESH_EXPIRATION: z.string().min(16),
+  DATABASE_URL: z.string().min(16),
 });
 
 const envServer = envConfig.safeParse({

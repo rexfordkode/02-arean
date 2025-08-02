@@ -39,6 +39,10 @@ export const profiles = pgTable('profiles', {
   phone: text('phone'),
   birthdate: timestamp('birthdate', { mode: 'date' }),
 
+  // Complex fields stored as JSONB
+  address: jsonb('address'),
+  socialLinks: jsonb('social_links'),
+
   createdAt: timestamp('created_at', { mode: 'date' }).notNull().defaultNow(),
   updatedAt: timestamp('updated_at', { mode: 'date' }).notNull().defaultNow(),
 });
